@@ -141,7 +141,7 @@ When `DEMO_ACCESS_TOKEN` is set, every request without the token (query `?token=
 | Deliverable | Location |
 |---|---|
 | Technical documentation | `docs/technical_documentation.md` |
-| Presentation deck | submitted with the entry (PDF) |
+| Presentation deck | [`docs/SpendGuard_AI_deck.pdf`](docs/SpendGuard_AI_deck.pdf) (12 slides, also submitted with the entry) |
 | Demo video | https://www.youtube.com/watch?v=biHBMpNJA3I (script: `docs/demo_script.md`) |
 | Source code, deployment, tests | this repository |
 | Security self-assessment | `docs/security_self_assessment.md` |
@@ -156,7 +156,7 @@ app/modules/    guardian, data_ingestion, auto_categorizer, ghost_hunter, monte_
 app/static/     web UI (Agent Console + dashboard)
 data/           sample statement, demo files (injected CSV, PDFs, scam screenshot), Guardian lists
 evals/          functional, Guardian-corpus and adversarial suites; weight fitting
-docs/           technical documentation, security self-assessment, demo script
+docs/           technical documentation, security self-assessment, demo script, presentation deck (PDF)
 tests/          pytest suite
 scripts/        evidence generator and audit-chain checker
 evidence/       execution evidence for deliverable 06
