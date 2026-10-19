@@ -1,0 +1,13 @@
+{
+  "about": "Team-curated list of payee accounts reported in public scam warnings. Entries are added by hand with a source link. The accounts below are DEMO placeholders for the competition sandbox; replace them with entries verified on tinnhiemmang.vn (NCSC account lookup), canhbao.ncsc.gov.vn or police bulletins before any real use.",
+  "lookup_sources": [
+    "https://tinnhiemmang.vn/ (Tra cứu > Tra cứu tài khoản, National Cyber Security Center)",
+    "https://canhbao.ncsc.gov.vn/",
+    "https://bocongan.gov.vn/ (scam warnings)"
+  ],
+  "entries": [
+    {"account": "9999999999", "bank": "", "label": "demo: police-impersonation custody account", "source": "https://tinnhiemmang.vn/ (demo placeholder, not a verified entry)", "added": "2026-10-13"},
+    {"account": "8888888888", "bank": "", "label": "demo: task-scam deposit account", "source": "https://canhbao.ncsc.gov.vn/ (demo placeholder, not a verified entry)", "added": "2026-10-13"},
+    {"account": "7777777777", "bank": "", "label": "demo: prize-fee collection account", "source": "https://bocongan.gov.vn/ (demo placeholder, not a verified entry)", "added": "2026-10-13"}
+  ]
+}

@@ -1,0 +1,51 @@
+id,date,description,amount,type,category,subcategory,wallet,merchant
+TX1001,2026-07-01,Techcombank Nhan luong thang 06 Cong ty Cong nghe FPT,35000000,inflow,Income,Salary,Main Wallet,FPT Software
+TX1002,2026-07-02,Thanh toan phi Spotify Premium hang thang,59000,outflow,Wants,Subscription,Main Wallet,Spotify
+TX1003,2026-07-03,Tien thue can ho Vinhomes Central Park thang 7,8500000,outflow,Needs,Housing,Main Wallet,Vinhomes
+TX1004,2026-07-04,WinMart Thanh toan thuc pham tuoi song tuan 1,820000,outflow,Needs,Groceries,Main Wallet,WinMart
+TX1005,2026-07-05,Petrolimex Do xang xe may Tay Son,120000,outflow,Needs,Transport,Main Wallet,Petrolimex
+TX1006,2026-07-07,Highlands Coffee Nguyen Huu Canh 2 ly ca phe sua,90000,outflow,Wants,Dining,Fun Wallet,Highlands Coffee
+TX1007,2026-07-10,Phi hoi vien California Fitness and Yoga Club thang 7,850000,outflow,Wants,Subscription,Main Wallet,California Fitness
+TX1008,2026-07-12,Shopee Pay Mua tai nghe Bluetooth Baseus,450000,outflow,Wants,Shopping,Fun Wallet,Shopee
+TX1009,2026-07-15,Netflix Subscription Renewal goi tieu chuan HD,260000,outflow,Wants,Subscription,Main Wallet,Netflix
+TX1010,2026-07-18,EVN Thanh toan hoa don tien dien thang 6,1150000,outflow,Needs,Utilities,Main Wallet,EVN
+TX1011,2026-07-20,Co.opmart Mua rau cu thit bo sua tuoi,740000,outflow,Needs,Groceries,Main Wallet,Co.opmart
+TX1012,2026-07-22,Apple Store iCloud+ 200GB Storage gia han,59000,outflow,Wants,Subscription,Main Wallet,Apple iCloud
+TX1013,2026-07-25,Nha thuoc Pharmacity Thuoc cam cum vitamin C,210000,outflow,Needs,Healthcare,Main Wallet,Pharmacity
+TX1014,2026-07-28,CGV Cinemas Landmark 81 Ve xem phim va bap nuoc,280000,outflow,Wants,Entertainment,Fun Wallet,CGV Cinemas
+TX1015,2026-07-30,Chuyen khoan tiet kiem tich luy Quy Khan Cap thang 7,7000000,outflow,Savings/Debts,Emergency Vault,Emergency Vault,Internal Transfer
+TX1016,2026-08-01,Techcombank Nhan luong thang 07 Cong ty Cong nghe FPT,35000000,inflow,Income,Salary,Main Wallet,FPT Software
+TX1017,2026-08-02,Thanh toan phi Spotify Premium hang thang,59000,outflow,Wants,Subscription,Main Wallet,Spotify
+TX1018,2026-08-03,Tien thue can ho Vinhomes Central Park thang 8,8500000,outflow,Needs,Housing,Main Wallet,Vinhomes
+TX1019,2026-08-05,Coursera Inc Thu phi khoa hoc Machine Learning,950000,outflow,Wants,Subscription,Main Wallet,Coursera
+TX1020,2026-08-06,WinMart Sieu thi mua thuc pham gia dinh tuan 1,890000,outflow,Needs,Groceries,Main Wallet,WinMart
+TX1021,2026-08-08,GrabFood Com tam Cali bua trua van phong,75000,outflow,Wants,Dining,Fun Wallet,Grab
+TX1022,2026-08-10,Phi hoi vien California Fitness and Yoga Club thang 8,850000,outflow,Wants,Subscription,Main Wallet,California Fitness
+TX1023,2026-08-12,Viettel Telecom Hoa don cuoc Internet cap quang thang 7,330000,outflow,Needs,Utilities,Main Wallet,Viettel
+TX1024,2026-08-15,Netflix Subscription Renewal goi tieu chuan HD,260000,outflow,Wants,Subscription,Main Wallet,Netflix
+TX1025,2026-08-17,Bao hiem nhan tho Dai-ichi Life dinh ky quy 3,3600000,outflow,Savings/Debts,Insurance,Emergency Vault,Dai-ichi Life
+TX1026,2026-08-19,EVN Thanh toan tien dien sinh hoat thang 7,1280000,outflow,Needs,Utilities,Main Wallet,EVN
+TX1027,2026-08-22,Apple Store iCloud+ 200GB Storage gia han,59000,outflow,Wants,Subscription,Main Wallet,Apple iCloud
+TX1028,2026-08-25,Uniqlo Vincom Ao khoac chong nang va quan jeans,1450000,outflow,Wants,Shopping,Fun Wallet,Uniqlo
+TX1029,2026-08-28,WinMart Mua nhu yeu pham giat xa thuc pham,670000,outflow,Needs,Groceries,Main Wallet,WinMart
+TX1030,2026-08-30,Chuyen khoan tiet kiem tich luy Quy Khan Cap thang 8,7000000,outflow,Savings/Debts,Emergency Vault,Emergency Vault,Internal Transfer
+TX1031,2026-09-01,Techcombank Nhan luong thang 08 Cong ty Cong nghe FPT,35000000,inflow,Income,Salary,Main Wallet,FPT Software
+TX1032,2026-09-02,Thu nhap Freelance tu van AI Client Singapore,6200000,inflow,Income,Freelance,Main Wallet,Upwork Client
+TX1033,2026-09-02,Thanh toan phi Spotify Premium hang thang,59000,outflow,Wants,Subscription,Main Wallet,Spotify
+TX1034,2026-09-03,Tien thue can ho Vinhomes Central Park thang 9,8500000,outflow,Needs,Housing,Main Wallet,Vinhomes
+TX1035,2026-09-05,Coursera Inc Thu phi khoa hoc Machine Learning,950000,outflow,Wants,Subscription,Main Wallet,Coursera
+TX1036,2026-09-06,WinMart Sieu thi mua thuc pham tuan dau thang,910000,outflow,Needs,Groceries,Main Wallet,WinMart
+TX1037,2026-09-08,Starbucks Coffee Reserve Han Thuyen,140000,outflow,Wants,Dining,Fun Wallet,Starbucks
+TX1038,2026-09-10,Phi hoi vien California Fitness and Yoga Club thang 9,850000,outflow,Wants,Subscription,Main Wallet,California Fitness
+TX1039,2026-09-12,Petrolimex Do xang xe may Cong Hoa,110000,outflow,Needs,Transport,Main Wallet,Petrolimex
+TX1040,2026-09-15,Netflix Subscription Renewal goi tieu chuan HD,260000,outflow,Wants,Subscription,Main Wallet,Netflix
+TX1041,2026-09-17,Tien nuoc Sawaco Tong cong ty cap nuoc Sai Gon,165000,outflow,Needs,Utilities,Main Wallet,Sawaco
+TX1042,2026-09-19,EVN Thanh toan tien dien thang 8,1310000,outflow,Needs,Utilities,Main Wallet,EVN
+TX1043,2026-09-21,Lau Haidilao Bitexco di an toi sinh nhat ban than,890000,outflow,Wants,Dining,Fun Wallet,Haidilao
+TX1044,2026-09-22,Apple Store iCloud+ 200GB Storage gia han,59000,outflow,Wants,Subscription,Main Wallet,Apple iCloud
+TX1045,2026-09-24,Nha sach Fahasa Mua sach lap trinh va kinh te,360000,outflow,Wants,Books,Fun Wallet,Fahasa
+TX1046,2026-09-26,Grab Car Di san bay Tan Son Nhat cong tac,195000,outflow,Needs,Transport,Main Wallet,Grab
+TX1047,2026-09-28,WinMart Mua sua chua trai cay thuc pham,540000,outflow,Needs,Groceries,Main Wallet,WinMart
+TX1048,2026-09-29,Chuyen khoan tiet kiem tich luy Quy Khan Cap thang 9,7000000,outflow,Savings/Debts,Emergency Vault,Emergency Vault,Internal Transfer
+TX1049,2026-09-30,Apple Store Online Tra gop hoac dat mua iPhone 16 Pro Max 256GB,34990000,outflow,Wants,Gadgets,Main Wallet,Apple Store
+TX1050,2026-10-02,Chuyen tien dau tu quy Telegram VIP Robot AI cam ket lai 2.5% ngay,25000000,outflow,Wants,Suspicious,Main Wallet,Unknown Telegram Entity

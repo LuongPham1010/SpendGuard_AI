@@ -1,0 +1,19 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      LLM_PROVIDER: none
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -r requirements.txt pytest httpx
+      - run: python -m pytest -q
+      - run: python -m evals.run_evals
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: evals/results

@@ -1,0 +1,43 @@
+{
+  "authority_impersonation": [
+    "Police, prosecutors and courts in Vietnam never ask citizens to transfer money by phone or chat. Summons are delivered in writing.",
+    "There is no such thing as a 'temporary custody account' for an investigation. Verify in person at the local station or call 113.",
+    "Real officers do not demand secrecy from your family.",
+    "Traffic fines, utility arrears and social-insurance updates are paid through official portals (Cổng dịch vụ công, the provider's own app), never to a personal account."
+  ],
+  "safe_account": [
+    "Banks never move your money to a 'safe account'. If someone asks you to do this, it is a scam.",
+    "Call the number printed on the back of your card, not a number the caller gave you."
+  ],
+  "investment_ponzi": [
+    "A guaranteed 1% per day compounds to over 3,600% per year. No legitimate investment pays that.",
+    "'Tasks' that pay commissions and then require a deposit to withdraw are a documented scam pattern."
+  ],
+  "otp_request": [
+    "Banks never ask for your OTP, PIN or password. Sharing an OTP hands over your account."
+  ],
+  "prize": [
+    "You cannot win a lottery you did not enter. Paying a fee to receive a prize is the scam itself."
+  ],
+  "romance": [
+    "Someone you have never met in person asking for money is the defining pattern of romance scams."
+  ],
+  "customs_fee": [
+    "Customs and couriers do not collect fees through personal bank accounts."
+  ],
+  "reported_account": [
+    "This account number appears on a public scam warning list. Money sent to reported accounts is rarely recovered."
+  ],
+  "generic": [
+    "Pause. Verify through an official channel you look up yourself, not a number the other side gave you."
+  ],
+  "refund_scam": [
+    "Refunds never require you to pay a fee first. A real refund goes back to the card or account you paid with."
+  ],
+  "relative_emergency": [
+    "A relative or boss who 'changed number' and needs money urgently to a stranger's account is the deepfake script. Call the number you already have for them."
+  ],
+  "fake_receipt": [
+    "A transfer receipt screenshot is not money. Check your own banking app; never pay a 'release' or 'activation' fee to receive a payment."
+  ]
+}

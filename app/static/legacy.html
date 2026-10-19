@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpendGuard AI – Autonomous Financial Auditor & Cognitive Fraud Defense</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col">
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-[#0e1626]/90 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Badges -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+          <i class="fa-solid fa-shield-halved text-white text-xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-xl tracking-tight text-white">SPENDGUARD <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">AI</span></span>
+            <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-900/60 text-blue-300 border border-blue-700/50">Shenzhen FinTech 2026</span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">WeBank & Tsinghua PBCSF – Topic A: Personal Finance Assistant</p>
+        </div>
+      </div>
+
+      <!-- Live Status Pills & Controls -->
+      <div class="flex items-center gap-3 text-xs sm:text-sm">
+        <!-- Gemini Status Indicator -->
+        <div id="gemini-status-pill" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-700/50 text-emerald-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-badge"></span>
+          <span class="font-medium">Gemini 3.8 Flash Online</span>
+        </div>
+
+        <!-- Security Guardrail Tier Status -->
+        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300">
+          <i class="fa-solid fa-lock text-blue-400"></i>
+          <span>3-Tier Matrix Active</span>
+        </div>
+
+        <!-- Currency Toggle -->
+        <div class="flex items-center bg-slate-800 rounded-lg p-0.5 border border-slate-700">
+          <button id="btn-curr-vnd" onclick="setCurrency('VND')" class="px-2.5 py-1 rounded-md text-xs font-bold transition-all bg-blue-600 text-white">VND</button>
+          <button id="btn-curr-usd" onclick="setCurrency('USD')" class="px-2.5 py-1 rounded-md text-xs font-medium text-slate-400 transition-all hover:text-white">USD</button>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <button onclick="openModal('modal-upload-csv')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-all flex items-center gap-1.5 font-medium text-xs">
+          <i class="fa-solid fa-file-csv text-blue-400"></i>
+          <span class="hidden sm:inline">Upload CSV</span>
+        </button>
+
+        <button onclick="openModal('modal-ocr')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-all flex items-center gap-1.5 font-medium text-xs">
+          <i class="fa-solid fa-receipt text-indigo-400"></i>
+          <span class="hidden sm:inline">Receipt OCR</span>
+        </button>
+
+        <button onclick="triggerAutoSavingsSweep()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-md shadow-emerald-900/30 transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-bolt"></i>
+          <span class="hidden sm:inline">Auto Sweep</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-8">
+
+    <!-- Row 0: Agent hero -->
+    <section id="agent-hero" class="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-[#0f1a2b] via-[#0d1322] to-[#0b0f19] p-6 shadow-[0_0_60px_-20px_rgba(16,185,129,0.35)]">
+      <div class="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl"></div>
+
+      <div class="relative flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <i class="fa-solid fa-robot text-slate-900 text-lg"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold tracking-tight">The agent that holds the wallet</h2>
+            <p class="text-xs text-slate-400">Plans, validates every action against the 3-tier matrix, executes what it may, and stops in front of you with a reason for the rest.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-[11px] font-mono">
+          <span id="hero-model" class="px-2.5 py-1 rounded-full border border-slate-700 bg-slate-900/70 text-slate-300"><i class="fa-solid fa-circle text-[7px] text-slate-500 mr-1"></i>model…</span>
+          <span class="px-2.5 py-1 rounded-full border border-slate-700 bg-slate-900/70 text-slate-300">T1 auto · T2 ≤ 5,000,000 ₫ · T3 human</span>
+          <button id="rail-clear" class="px-2.5 py-1 rounded-full border border-slate-700 text-slate-400 hover:text-white">clear</button>
+        </div>
+      </div>
+
+      <!-- pipeline rail -->
+      <div id="agent-rail" class="relative mt-5 grid grid-cols-4 lg:grid-cols-8 gap-2">
+        <div class="rail-node" data-phase="INTAKE"><div class="rail-ph">INTAKE</div><div class="rail-detail"></div></div>
+        <div class="rail-node" data-phase="GUARDRAIL"><div class="rail-ph">GUARDRAIL</div><div class="rail-detail"></div></div>
+        <div class="rail-node" data-phase="PLAN"><div class="rail-ph">PLAN</div><div class="rail-detail"></div></div>
+        <div class="rail-node" data-phase="PREFLIGHT"><div class="rail-ph">PREFLIGHT</div><div class="rail-detail"></div></div>
+        <div class="rail-node" data-phase="EXECUTE"><div class="rail-ph">EXECUTE</div><div class="rail-detail"></div></div>
+        <div class="rail-node" data-phase="REPLAN"><div class="rail-ph">REPLAN</div><div class="rail-detail"></div></div>
+        <div class="rail-node" data-phase="AWAIT_HUMAN"><div class="rail-ph">AWAIT HUMAN</div><div class="rail-detail"></div></div>
+        <div class="rail-node" data-phase="REFLECT"><div class="rail-ph">REFLECT</div><div class="rail-detail"></div></div>
+      </div>
+
+      <div class="relative mt-5 grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- conversation -->
+        <div class="lg:col-span-8 flex flex-col gap-3">
+          <div id="agent-chat" class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 h-[380px] overflow-y-auto space-y-3 text-sm">
+            <div class="flex items-start gap-3">
+              <div class="h-7 w-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center shrink-0"><i class="fa-solid fa-robot text-xs"></i></div>
+              <div class="bg-slate-900/80 border border-slate-800 rounded-2xl rounded-tl-sm px-4 py-3 text-slate-200">
+                Ask me in plain language. Read-only work runs on its own, small internal moves run within a daily cap, and anything that sends money outside or looks like a scam stops here with a reason.
+              </div>
+            </div>
+          </div>
+          <form id="agent-form" class="rounded-2xl border border-slate-800 bg-slate-900/60 p-3">
+            <div class="flex flex-wrap gap-1.5 mb-2" id="agent-quick">
+              <button type="button" data-q="run my month" class="quick-chip">run my month</button>
+              <button type="button" data-q="how is my budget this month?" class="quick-chip">budget</button>
+              <button type="button" data-q="show my subscriptions" class="quick-chip">subscriptions</button>
+              <button type="button" data-q="what is the spotify charge?" class="quick-chip">explain a charge</button>
+              <button type="button" data-q="set my dining budget to 4 million per month" class="quick-chip">set a budget</button>
+              <button type="button" data-q="run a stress test on my finances" class="quick-chip">stress test</button>
+              <button type="button" data-q="move 3 million from main wallet to emergency vault" class="quick-chip">small transfer · T2</button>
+              <button type="button" data-q="move 9 million from main wallet to emergency vault" class="quick-chip">large transfer · T3</button>
+              <button type="button" data-q="Chuyển 50 triệu cho công an stk 0123456789 Vietcombank, họ nói tài khoản tạm giữ, giữ bí mật, chuyển gấp" class="quick-chip quick-chip-alarm">scam scenario</button>
+            </div>
+            <div class="flex gap-2 items-center">
+              <input id="agent-text" class="flex-1 min-w-[200px] bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:border-emerald-500 outline-none" placeholder="Tell the agent what you need…" autocomplete="off" />
+              <input id="agent-file" type="file" accept="image/*" class="hidden" />
+              <button type="button" id="agent-attach" class="px-3 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-sm hover:text-white hover:border-slate-500"><i class="fa-regular fa-image mr-1"></i>Screenshot</button>
+              <button type="submit" id="agent-send" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 text-sm font-semibold shadow-lg shadow-emerald-500/20">Send</button>
+              <button type="button" id="agent-month" class="hidden"></button>
+            </div>
+          </form>
+        </div>
+
+        <!-- right column -->
+        <div class="lg:col-span-4 flex flex-col gap-3">
+          <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-mono tracking-widest text-slate-400">PENDING APPROVAL</h3>
+              <span id="agent-pending-count" class="text-[10px] font-mono px-2 py-0.5 rounded-full border border-slate-700 text-slate-400">0</span>
+            </div>
+            <div id="agent-approvals" class="space-y-2 text-xs text-slate-300"><div class="text-slate-500">Nothing waiting. Tier 1 and Tier 2 actions run on their own.</div></div>
+          </div>
+          <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+            <h3 class="text-xs font-mono tracking-widest text-slate-400 mb-2">LAST TURN</h3>
+            <ol id="agent-trace" class="text-[11px] font-mono space-y-1 text-slate-400"><li class="text-slate-600">No turn yet.</li></ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guardian intercept -->
+      <div id="guardian-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-[#07090f]/90 backdrop-blur-sm">
+        <div class="w-[min(760px,92vw)] rounded-3xl border border-rose-500/60 bg-[#160b10] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.6)]">
+          <div class="flex items-center gap-5">
+            <svg class="h-24 w-24 shrink-0" viewBox="0 0 84 84">
+              <circle cx="42" cy="42" r="34" fill="none" stroke="#3a1a22" stroke-width="8"/>
+              <circle id="guardian-arc" cx="42" cy="42" r="34" fill="none" stroke="#fb7185" stroke-width="8" stroke-linecap="round" transform="rotate(-90 42 42)" stroke-dasharray="0 999"/>
+              <text id="guardian-score" x="42" y="48" text-anchor="middle" fill="#fff" font-size="18" font-weight="700" font-family="JetBrains Mono, monospace">0</text>
+            </svg>
+            <div>
+              <h2 class="text-2xl font-bold tracking-tight"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i>Transfer frozen</h2>
+              <div id="guardian-kind" class="font-mono text-xs tracking-widest text-rose-300 mt-1">SUSPICIOUS TRANSFER</div>
+              <p id="guardian-reason" class="text-xs text-slate-400 mt-1"></p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5 text-sm">
+            <div><h4 class="font-mono text-[11px] tracking-widest text-slate-400 mb-2">WHAT I SAW</h4><ul id="guardian-evidence" class="list-disc pl-5 space-y-1 text-slate-200"></ul></div>
+            <div><h4 class="font-mono text-[11px] tracking-widest text-slate-400 mb-2">WHAT YOU SHOULD KNOW</h4><ul id="guardian-facts" class="list-disc pl-5 space-y-1 text-slate-200"></ul></div>
+          </div>
+          <div class="flex items-center justify-between mt-6">
+            <span class="font-mono text-sm text-amber-300">Cooling-off: <span id="guardian-countdown">60</span>s · notice sent to trusted contact (simulated)</span>
+            <button id="guardian-close" class="px-4 py-2 rounded-xl bg-white text-rose-900 font-semibold text-sm">Review in approval queue</button>
+          </div>
+        </div>
+      </div>
+      <div id="quiz-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+        <form id="quiz-form" class="w-[min(620px,92vw)] rounded-3xl border border-slate-700 bg-slate-900 p-6 space-y-4 text-sm text-slate-200"></form>
+      </div>
+    </section>
+
+    <!-- Row 1: KPI Cards & Virtual Sandbox Wallets -->
+    <section class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2">
+          <i class="fa-solid fa-chart-line text-blue-400"></i>
+          Executive Financial Status & Virtual Sandbox Wallets
+        </h2>
+        <span class="text-xs text-slate-400">Real-time simulation connected to 50 audited transactions</span>
+      </div>
+
+      <!-- KPI Summary Cards Grid -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- KPI 1: Net Worth -->
+        <div class="glass-panel p-4 rounded-xl border border-slate-800/80 space-y-1">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+            <span>Total Liquid Wealth</span>
+            <i class="fa-solid fa-vault text-blue-400"></i>
+          </div>
+          <div id="kpi-total-balance" class="text-xl sm:text-2xl font-black text-white">200,000,000 ₫</div>
+          <div class="text-[11px] text-emerald-400 flex items-center gap-1">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+            <span>Across 3 Sandbox Wallets</span>
+          </div>
+        </div>
+
+        <!-- KPI 2: Monthly Inflow -->
+        <div class="glass-panel p-4 rounded-xl border border-slate-800/80 space-y-1">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+            <span>Monthly Inflow</span>
+            <i class="fa-solid fa-arrow-down-left text-emerald-400"></i>
+          </div>
+          <div id="kpi-inflow" class="text-xl sm:text-2xl font-black text-emerald-400">41,200,000 ₫</div>
+          <div class="text-[11px] text-slate-400">Salary + Verified Freelance</div>
+        </div>
+
+        <!-- KPI 3: Monthly Outflow -->
+        <div class="glass-panel p-4 rounded-xl border border-slate-800/80 space-y-1">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+            <span>Monthly Outflow</span>
+            <i class="fa-solid fa-arrow-up-right text-rose-400"></i>
+          </div>
+          <div id="kpi-outflow" class="text-xl sm:text-2xl font-black text-rose-400">24,530,000 ₫</div>
+          <div class="text-[11px] text-slate-400">Needs (50%) & Discretionary (30%)</div>
+        </div>
+
+        <!-- KPI 4: 50/30/20 Adherence & Savings Rate -->
+        <div class="glass-panel p-4 rounded-xl border border-slate-800/80 space-y-1">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+            <span>50/30/20 Health Score</span>
+            <i class="fa-solid fa-heart-pulse text-indigo-400"></i>
+          </div>
+          <div id="kpi-adherence" class="text-xl sm:text-2xl font-black text-indigo-300">92.4 / 100</div>
+          <div id="kpi-savings-rate" class="text-[11px] text-emerald-400 flex items-center gap-1">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Savings Rate: 24.3% (Target >= 20%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 Sandbox Wallets -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        <!-- Main Wallet Card -->
+        <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-blue-500 relative overflow-hidden group hover:border-slate-700 transition-all">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-xs uppercase font-bold tracking-wider text-blue-400">Tier 2 Controlled</span>
+              <h3 class="text-base font-bold text-white mt-0.5">Main Wallet</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Daily checking & incoming salary account</p>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+              <i class="fa-regular fa-credit-card"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div id="wallet-main-balance" class="text-2xl font-black text-white">65,000,000 ₫</div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+            <span class="text-[11px] text-slate-400">Autonomous transfers <= 5M</span>
+            <button onclick="openTransferModal('Main Wallet')" class="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1">
+              Transfer <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Emergency Vault Card -->
+        <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-emerald-500 relative overflow-hidden group hover:border-slate-700 transition-all">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-xs uppercase font-bold tracking-wider text-emerald-400">Tier 3 Protected</span>
+              <h3 class="text-base font-bold text-white mt-0.5">Emergency Vault</h3>
+              <p class="text-xs text-slate-400 mt-0.5">High-yield locked reserve & 6-month buffer</p>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <i class="fa-solid fa-shield-heart"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div id="wallet-emergency-balance" class="text-2xl font-black text-emerald-400">120,000,000 ₫</div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+            <span class="text-[11px] text-slate-400">Locked against impulse spend</span>
+            <button onclick="openTransferModal('Emergency Vault')" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+              Manage <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Fun Wallet Card -->
+        <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-purple-500 relative overflow-hidden group hover:border-slate-700 transition-all">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-xs uppercase font-bold tracking-wider text-purple-400">Discretionary</span>
+              <h3 class="text-base font-bold text-white mt-0.5">Fun Wallet</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Hobbies, dining out & entertainment quota</p>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div id="wallet-fun-balance" class="text-2xl font-black text-purple-300">15,000,000 ₫</div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+            <span class="text-[11px] text-slate-400">Guilt-free lifestyle spending</span>
+            <button onclick="openTransferModal('Fun Wallet')" class="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1">
+              Spend <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Row 2: 50/30/20 Framework & Cashflow Analytics -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- 50/30/20 Donut Chart & Breakdown -->
+      <div class="lg:col-span-5 glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-pie-chart text-indigo-400"></i>
+            50/30/20 Financial Rule Compliance
+          </h3>
+          <span class="text-xs px-2 py-0.5 rounded bg-indigo-900/40 text-indigo-300 border border-indigo-700/40">Standard</span>
+        </div>
+        
+        <div class="relative h-56 flex items-center justify-center">
+          <canvas id="chart-50-30-20"></canvas>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+              <span class="font-medium text-slate-200">Needs (Target 50%)</span>
+            </div>
+            <span id="breakdown-needs-val" class="font-bold text-white">12,500,000 ₫ (48.1%)</span>
+          </div>
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+              <span class="font-medium text-slate-200">Wants (Target 30%)</span>
+            </div>
+            <span id="breakdown-wants-val" class="font-bold text-white">7,200,000 ₫ (27.7%)</span>
+          </div>
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+              <span class="font-medium text-slate-200">Savings/Vault (Target 20%)</span>
+            </div>
+            <span id="breakdown-savings-val" class="font-bold text-emerald-400">6,300,000 ₫ (24.2%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Cashflow Breakdown Bar Chart -->
+      <div class="lg:col-span-7 glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-column text-emerald-400"></i>
+            Cashflow Inflows vs Category Expenses
+          </h3>
+          <span class="text-xs text-slate-400">July – September 2026</span>
+        </div>
+
+        <div class="relative h-72">
+          <canvas id="chart-cashflow"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Row 3: Killer Features Tabbed Suite -->
+    <section class="glass-panel p-6 rounded-3xl border border-slate-800 space-y-6">
+      
+      <!-- Tab Header Navigation -->
+      <div class="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-4">
+        <button onclick="switchTab('ghost')" id="tab-btn-ghost" class="tab-btn active px-4 py-2.5 rounded-xl border border-transparent text-sm transition-all flex items-center gap-2">
+          <i class="fa-solid fa-ghost text-amber-400"></i>
+          <span>1. Ghost Subscription Hunter</span>
+        </button>
+        <button onclick="switchTab('debate')" id="tab-btn-debate" class="tab-btn px-4 py-2.5 rounded-xl border border-transparent text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-comments text-blue-400"></i>
+          <span>2. Multi-Agent Debate Arena</span>
+        </button>
+        <button onclick="switchTab('montecarlo')" id="tab-btn-montecarlo" class="tab-btn px-4 py-2.5 rounded-xl border border-transparent text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-chart-area text-purple-400"></i>
+          <span>3. Monte Carlo Stress-Testing</span>
+        </button>
+        <button onclick="switchTab('antiscam')" id="tab-btn-antiscam" class="tab-btn px-4 py-2.5 rounded-xl border border-transparent text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-shield-virus text-rose-400"></i>
+          <span>4. Cognitive Anti-Scam Shield</span>
+        </button>
+      </div>
+
+      <!-- Tab Content 1: Ghost Subscription Hunter -->
+      <div id="tab-content-ghost" class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <div>
+            <h4 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-circle-exclamation text-amber-400"></i>
+              Autonomous Recurrence Detection Algorithm (27 &le; &Delta;t &le; 32 Days)
+            </h4>
+            <p class="text-xs text-slate-400 mt-0.5">Identifies hidden auto-renewals, computes compound annual waste, and synthesizes 1-click legal cancellation notices.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 text-right">
+            <div>
+              <span class="text-xs text-slate-400">Active Annual Leakage:</span>
+              <div id="ghost-total-leakage" class="text-lg font-black text-rose-400">14,880,000 ₫ / yr</div>
+            </div>
+            <div id="ghost-saved-container" class="hidden pl-4 border-l border-slate-700">
+              <span class="text-xs text-emerald-400">Annual Savings Secured:</span>
+              <div id="ghost-saved-leakage" class="text-lg font-black text-emerald-400">0 ₫ / yr</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subscriptions Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-800/70 text-slate-300 font-semibold uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="p-3">Service / Merchant</th>
+                <th class="p-3">Recurring Fee</th>
+                <th class="p-3">Cadence (&Delta;t)</th>
+                <th class="p-3">Cycles</th>
+                <th class="p-3">Annual Drain</th>
+                <th class="p-3">Last Charged</th>
+                <th class="p-3 text-right">Autonomous Action</th>
+              </tr>
+            </thead>
+            <tbody id="subscriptions-table-body" class="divide-y divide-slate-800/80 bg-slate-900/30">
+              <!-- Dynamically populated via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab Content 2: Multi-Agent Financial Debate Arena -->
+      <div id="tab-content-debate" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Debate Input Form -->
+          <div class="lg:col-span-5 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-gavel text-blue-400"></i>
+                Purchase Approval Proposal
+              </h4>
+              <span class="text-[11px] text-slate-400">Evaluates live wallet ratios</span>
+            </div>
+
+            <!-- Quick Presets -->
+            <div class="flex flex-wrap gap-1.5">
+              <span class="text-xs text-slate-400 py-1">Presets:</span>
+              <button onclick="fillDebatePreset('iPhone 16 Pro Max 256GB', 34990000, 'Gadgets', 'Need upgraded camera for content creation')" class="text-[11px] px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-blue-300 border border-slate-700 transition-all">iPhone 16 (35M)</button>
+              <button onclick="fillDebatePreset('Espresso Coffee Machine Breville', 15500000, 'Dining', 'Save money on daily cafe coffee')" class="text-[11px] px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 transition-all">Coffee Machine (15.5M)</button>
+              <button onclick="fillDebatePreset('Mechanical Keyboard Keychron', 2200000, 'Wants', 'Replace old malfunctioning keyboard')" class="text-[11px] px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 transition-all">Keyboard (2.2M)</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div>
+                <label class="block text-slate-300 font-medium mb-1">Item / Asset Name</label>
+                <input id="debate-item-name" type="text" value="iPhone 16 Pro Max 256GB" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-slate-300 font-medium mb-1">Price (VND)</label>
+                  <input id="debate-price" type="number" value="34990000" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="block text-slate-300 font-medium mb-1">Monthly Income (VND)</label>
+                  <input id="debate-income" type="number" value="35000000" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+              </div>
+              <div>
+                <label class="block text-slate-300 font-medium mb-1">Your Personal Justification</label>
+                <textarea id="debate-justification" rows="2" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500" placeholder="Why do you want or need this purchase?">Upgrading phone to improve productivity and camera quality for marketing work.</textarea>
+              </div>
+            </div>
+
+            <button id="btn-run-debate" onclick="runFinancialDebate()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold text-white text-xs shadow-lg shadow-blue-900/40 transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-users-rays"></i>
+              <span>Trigger 3-Agent Financial Debate</span>
+            </button>
+          </div>
+
+          <!-- Debate Interactive Feed & Final Verdict Banner -->
+          <div class="lg:col-span-7 space-y-4">
+            <!-- Final Verdict Card (populated) -->
+            <div id="debate-verdict-card" class="hidden p-4 rounded-2xl border transition-all">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- Dialogue Turns Feed -->
+            <div id="debate-feed" class="space-y-3 max-h-[460px] overflow-y-auto pr-2">
+              <div class="text-center py-12 text-slate-500 text-xs">
+                <i class="fa-solid fa-comments text-3xl mb-2 text-slate-600 block"></i>
+                Select an item and trigger the debate to observe multi-agent financial deliberation.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tab Content 3: Monte Carlo Stress-Testing -->
+      <div id="tab-content-montecarlo" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Parameters Controls -->
+          <div class="lg:col-span-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-4">
+            <h4 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-purple-400"></i>
+              Stress Simulation Parameters
+            </h4>
+
+            <div class="space-y-3 text-xs">
+              <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                  <span>Initial Savings:</span>
+                  <span id="mc-disp-savings" class="font-bold text-white">50M ₫</span>
+                </div>
+                <input id="mc-input-savings" type="range" min="10000000" max="200000000" step="5000000" value="50000000" oninput="updateMonteCarloLabels()" class="w-full accent-purple-500">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                  <span>Monthly Income:</span>
+                  <span id="mc-disp-income" class="font-bold text-white">35M ₫</span>
+                </div>
+                <input id="mc-input-income" type="range" min="15000000" max="100000000" step="5000000" value="35000000" oninput="updateMonteCarloLabels()" class="w-full accent-purple-500">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                  <span>Monthly Expenses:</span>
+                  <span id="mc-disp-expenses" class="font-bold text-white">22M ₫</span>
+                </div>
+                <input id="mc-input-expenses" type="range" min="10000000" max="60000000" step="2000000" value="22000000" oninput="updateMonteCarloLabels()" class="w-full accent-purple-500">
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-2 text-[11px]">
+                <span class="font-bold text-slate-200 block">3 Stochastic Shocks Active:</span>
+                <div class="flex items-center gap-2 text-slate-300">
+                  <i class="fa-solid fa-briefcase text-rose-400"></i>
+                  <span>Income Disruption Shock (Prob: 10%)</span>
+                </div>
+                <div class="flex items-center gap-2 text-slate-300">
+                  <i class="fa-solid fa-kit-medical text-amber-400"></i>
+                  <span>Emergency Health/Repair (5M - 20M ₫)</span>
+                </div>
+                <div class="flex items-center gap-2 text-slate-300">
+                  <i class="fa-solid fa-arrow-trend-up text-blue-400"></i>
+                  <span>Inflation Expense Drift (10% / yr)</span>
+                </div>
+              </div>
+            </div>
+
+            <button id="btn-run-mc" onclick="runMonteCarloSimulation()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 font-bold text-white text-xs shadow-lg shadow-purple-900/40 transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-dice text-sm"></i>
+              <span>Simulate 1,000 Paths (12 Months)</span>
+            </button>
+          </div>
+
+          <!-- Simulation Fan Chart & Resilience Metrics -->
+          <div class="lg:col-span-8 space-y-4">
+            <!-- Resilience Indicators Bar -->
+            <div class="grid grid-cols-3 gap-3">
+              <div class="glass-panel p-3 rounded-xl border border-slate-800 text-center">
+                <span class="text-[11px] text-slate-400">Resilience Score</span>
+                <div id="mc-resilience-score" class="text-xl font-black text-purple-300 mt-0.5">85.4 / 100</div>
+              </div>
+              <div class="glass-panel p-3 rounded-xl border border-slate-800 text-center">
+                <span class="text-[11px] text-slate-400">Depletion Risk</span>
+                <div id="mc-depletion-risk" class="text-xl font-black text-emerald-400 mt-0.5">0.0 %</div>
+              </div>
+              <div class="glass-panel p-3 rounded-xl border border-slate-800 text-center">
+                <span class="text-[11px] text-slate-400">Recommended 6M Buffer</span>
+                <div id="mc-rec-buffer" class="text-xl font-black text-blue-400 mt-0.5">132,000,000 ₫</div>
+              </div>
+            </div>
+
+            <!-- Chart.js Fan Chart Container -->
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800 relative h-72">
+              <canvas id="chart-monte-carlo"></canvas>
+            </div>
+
+            <!-- Quantitative Synthesis Banner -->
+            <div id="mc-summary-banner" class="p-3 rounded-xl bg-purple-950/40 border border-purple-800/40 text-xs text-purple-200">
+              Run the simulation above to view quantitative stress test results.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tab Content 4: Cognitive Anti-Scam Shield -->
+      <div id="tab-content-antiscam" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Transfer Attempt Form -->
+          <div class="lg:col-span-6 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-fingerprint text-rose-400"></i>
+                Transfer Intent Pre-Flight Verification
+              </h4>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800/40">Tier 3 Defense</span>
+            </div>
+
+            <!-- Presets -->
+            <div class="flex flex-wrap gap-1.5">
+              <span class="text-xs text-slate-400 py-1">Scenarios:</span>
+              <button onclick="fillScamPreset('benign')" class="text-[11px] px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 transition-all">Safe Friend Payment</button>
+              <button onclick="fillScamPreset('ponzi')" class="text-[11px] px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-900/50 transition-all">Telegram Ponzi (2.5%/day)</button>
+              <button onclick="fillScamPreset('police')" class="text-[11px] px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-900/50 transition-all">Fake Police Threat</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-slate-300 font-medium mb-1">Beneficiary Name</label>
+                  <input id="scam-recipient" type="text" value="VIP Investment Robot AI" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-rose-500">
+                </div>
+                <div>
+                  <label class="block text-slate-300 font-medium mb-1">Account Number</label>
+                  <input id="scam-account" type="text" value="999888777666" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-rose-500">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-slate-300 font-medium mb-1">Destination Bank</label>
+                  <input id="scam-bank" type="text" value="Digital Overseas Bank" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-rose-500">
+                </div>
+                <div>
+                  <label class="block text-slate-300 font-medium mb-1">Transfer Amount (VND)</label>
+                  <input id="scam-amount" type="number" value="25000000" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-rose-500">
+                </div>
+              </div>
+              <div>
+                <label class="block text-slate-300 font-medium mb-1">Transfer Message / Note</label>
+                <input id="scam-note" type="text" value="Chuyen tien gap trong 15 phut de vao phong VIP nhan lai 2.5% ngay" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-rose-500">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-slate-300 font-medium mb-1">Promised Daily Yield (%)</label>
+                  <input id="scam-yield" type="number" step="0.1" value="2.5" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-rose-500">
+                </div>
+                <div>
+                  <label class="block text-slate-300 font-medium mb-1">Communication Source</label>
+                  <input id="scam-source" type="text" value="Telegram VIP Group Admin" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-rose-500">
+                </div>
+              </div>
+            </div>
+
+            <button onclick="scanAntiScamTransfer()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 font-bold text-white text-xs shadow-lg shadow-rose-900/40 transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-radar text-sm"></i>
+              <span>Audit & Execute Transfer</span>
+            </button>
+          </div>
+
+          <!-- Real-time Shield Scan Result -->
+          <div class="lg:col-span-6 space-y-4">
+            <div id="scam-result-card" class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs uppercase font-bold text-slate-400">Pre-Flight Risk Verdict</span>
+                <span id="scam-badge-level" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300">Ready</span>
+              </div>
+              <div id="scam-score-display" class="text-2xl font-black text-slate-200">0.0 / 100 Risk Score</div>
+              <p id="scam-explanation" class="text-xs text-slate-400">
+                Initiate a simulated transfer scan to verify against NLP urgency heuristics and mathematical Ponzi yield checks.
+              </p>
+              <div id="scam-tactics-list" class="space-y-1.5 pt-2 hidden">
+                <!-- List of tactics -->
+              </div>
+            </div>
+
+            <!-- Cognitive De-Escalation Protocol Callout -->
+            <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/80 space-y-2 text-xs">
+              <span class="font-bold text-slate-200 flex items-center gap-2">
+                <i class="fa-solid fa-brain text-indigo-400"></i>
+                Cognitive Fraud Defense Mechanism
+              </span>
+              <p class="text-slate-400 text-[11px] leading-relaxed">
+                When a victim is targeted by social engineering fraud, intense adrenaline impairs the rational prefrontal cortex.
+                SpendGuard AI imposes an autonomous 60-minute cooling period and activates an interactive 3-question cognitive safety quiz
+                to disrupt emotional trance before any funds can leave the sandbox.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Row 4: Audited Bank Statement (50 Ingested Transactions & PII Demonstration) -->
+    <section class="glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-indigo-400"></i>
+              Audited Bank Statement (<span id="tx-count-display">50</span> Transactions)
+            </h3>
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">PII Masking Active</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Card numbers, national IDs, and bank account numbers are sanitized before ingestion (Deliverables 05 & 06).</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+            <input id="tx-search-input" oninput="filterTransactions()" type="text" placeholder="Search transactions..." class="bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500 w-44 sm:w-56">
+          </div>
+          <button onclick="openModal('modal-upload-csv')" class="px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+            <span>Upload Statement</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Transactions Table -->
+      <div class="overflow-x-auto rounded-xl border border-slate-800 max-h-72 overflow-y-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-800/80 text-slate-400 uppercase text-[10px] tracking-wider sticky top-0">
+            <tr>
+              <th class="p-2.5">TX ID</th>
+              <th class="p-2.5">Date</th>
+              <th class="p-2.5">Description (PII Sanitized)</th>
+              <th class="p-2.5">Amount</th>
+              <th class="p-2.5">Type</th>
+              <th class="p-2.5">50/30/20 Category</th>
+              <th class="p-2.5">Wallet</th>
+            </tr>
+          </thead>
+          <tbody id="statement-table-body" class="divide-y divide-slate-800/60 bg-slate-900/30 text-[11px]">
+            <!-- Populated via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Row 5: Real-time Sandbox Execution Audit Log Stream (Deliverable 06) -->
+    <section class="glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-terminal text-blue-400"></i>
+            Sandbox Execution Audit Stream (Deliverable 06 Evidence)
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Tamper-evident chained SHA-256 execution ledger logged to <code class="text-blue-300">logs/sandbox_execution.log</code></p>
+        </div>
+        <button onclick="fetchAuditLogs()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-semibold border border-slate-700 flex items-center gap-1.5 self-start sm:self-auto">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>Refresh Audit Stream</span>
+        </button>
+      </div>
+
+      <!-- Logs Table -->
+      <div class="overflow-x-auto rounded-xl border border-slate-800/80 max-h-64 overflow-y-auto">
+        <table class="w-full text-left text-xs font-mono">
+          <thead class="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider sticky top-0">
+            <tr>
+              <th class="p-2.5">Timestamp</th>
+              <th class="p-2.5">Tier</th>
+              <th class="p-2.5">Module</th>
+              <th class="p-2.5">Action</th>
+              <th class="p-2.5">Status</th>
+              <th class="p-2.5">Tamper Hash</th>
+              <th class="p-2.5">Details</th>
+            </tr>
+          </thead>
+          <tbody id="audit-logs-table-body" class="divide-y divide-slate-800/50 bg-slate-950/40 text-[11px]">
+            <!-- Dynamically populated via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modals -->
+
+  <!-- Modal 1: Internal Wallet Transfer -->
+  <div id="modal-transfer" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel-elevated max-w-md w-full rounded-2xl p-6 space-y-4 modal-enter">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-money-bill-transfer text-blue-400"></i>
+          Sandbox Internal Transfer
+        </h3>
+        <button onclick="closeModal('modal-transfer')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-300 font-medium mb-1">Source Wallet</label>
+          <select id="transfer-src" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+            <option value="Main Wallet">Main Wallet</option>
+            <option value="Emergency Vault">Emergency Vault</option>
+            <option value="Fun Wallet">Fun Wallet</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-300 font-medium mb-1">Destination Wallet</label>
+          <select id="transfer-dst" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+            <option value="Emergency Vault">Emergency Vault</option>
+            <option value="Fun Wallet">Fun Wallet</option>
+            <option value="Main Wallet">Main Wallet</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-300 font-medium mb-1">Amount (VND)</label>
+          <input id="transfer-amount" type="number" value="2000000" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+          <span class="text-[10px] text-slate-400 mt-1 block">Tier 2: &le; 5,000,000 ₫ auto-executes. &gt; 5M requires approval.</span>
+        </div>
+        <div>
+          <label class="block text-slate-300 font-medium mb-1">Transfer Note</label>
+          <input id="transfer-note" type="text" value="Internal allocation sweep" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+        </div>
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeModal('modal-transfer')" class="w-1/2 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">Cancel</button>
+        <button onclick="executeWalletTransfer()" class="w-1/2 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold">Confirm Transfer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: 1-Click Unsubscribe Templates -->
+  <div id="modal-unsubscribe" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel-elevated max-w-2xl w-full rounded-2xl p-6 space-y-4 modal-enter">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-file-contract text-amber-400 text-lg"></i>
+          <div>
+            <h3 id="unsub-modal-title" class="text-base font-bold text-white">Cancel Subscription Notice</h3>
+            <span id="unsub-modal-subtitle" class="text-xs text-slate-400">Formal legal revocation under Consumer Protection Guidelines</span>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-unsubscribe')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <!-- Language Toggle -->
+      <div class="flex items-center justify-between">
+        <div class="flex gap-2">
+          <button id="btn-unsub-lang-en" onclick="setUnsubLang('EN')" class="px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white">English (EN)</button>
+          <button id="btn-unsub-lang-vi" onclick="setUnsubLang('VI')" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-slate-800">Tiếng Việt (VI)</button>
+        </div>
+        <a id="unsub-portal-link" href="#" target="_blank" class="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1">
+          Open Direct Cancellation Portal <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      </div>
+
+      <!-- Email Template Preformatted Text -->
+      <div class="relative">
+        <textarea id="unsub-template-text" readonly rows="10" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 focus:outline-none select-all"></textarea>
+      </div>
+
+      <div class="flex justify-between items-center pt-2">
+        <button onclick="copyUnsubTemplate()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-regular fa-copy"></i>
+          <span id="copy-btn-text">Copy Email Notice</span>
+        </button>
+        <button onclick="dispatchAutonomousUnsubscribe()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-bold shadow-lg shadow-amber-900/30">
+          Execute Tier 2 Autonomous Cancellation
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Receipt OCR -->
+  <div id="modal-ocr" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel-elevated max-w-md w-full rounded-2xl p-6 space-y-4 modal-enter">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-camera text-indigo-400"></i>
+          Gemini Multimodal Receipt OCR
+        </h3>
+        <button onclick="closeModal('modal-ocr')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <p class="text-slate-400">Upload or simulate a receipt to extract items, merchant, and 50/30/20 category with Gemini Flash.</p>
+        <div class="border-2 border-dashed border-slate-700 rounded-2xl p-6 text-center hover:border-indigo-500 transition-all cursor-pointer">
+          <input id="ocr-file-input" type="file" accept="image/*" class="hidden" onchange="handleOcrFileUpload(event)">
+          <label for="ocr-file-input" class="cursor-pointer space-y-2 block">
+            <i class="fa-solid fa-cloud-arrow-up text-3xl text-indigo-400"></i>
+            <span class="block text-slate-300 font-semibold">Click to browse or drop receipt image</span>
+            <span class="text-[11px] text-slate-500 block">Supports JPG, PNG, WebP (Starbucks, WinMart, Apple, etc.)</span>
+          </label>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="simulateOcrSample('starbucks_receipt.jpg')" class="w-1/2 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px]">Simulate Starbucks</button>
+          <button onclick="simulateOcrSample('winmart_groceries.jpg')" class="w-1/2 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px]">Simulate WinMart</button>
+        </div>
+        <div id="ocr-result-box" class="hidden p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] space-y-1">
+          <!-- OCR parsed output -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Cognitive Safety Quiz & Scam Lockdown -->
+  <div id="modal-quiz" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel-elevated max-w-xl w-full rounded-3xl p-6 space-y-5 border-2 border-rose-500/80 shadow-2xl shadow-rose-950/80 modal-enter">
+      
+      <!-- Red Alert Header -->
+      <div class="flex items-start justify-between border-b border-rose-900/60 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-rose-600/20 border border-rose-500 flex items-center justify-center text-rose-500 text-2xl">
+            <i class="fa-solid fa-triangle-exclamation pulse-badge"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-400">Autonomous Tier 3 Lockdown Triggered</span>
+            <h3 class="text-lg font-black text-white">Cognitive Anti-Scam Shield Active</h3>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] text-slate-400">Cooling Timer</span>
+          <div id="quiz-cooling-timer" class="text-lg font-mono font-bold text-amber-400">59:59</div>
+        </div>
+      </div>
+
+      <!-- Warning description -->
+      <div class="p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/40 text-xs text-rose-200 space-y-1">
+        <p class="font-bold flex items-center gap-1.5 text-rose-300">
+          <i class="fa-solid fa-circle-radiation"></i>
+          High-Risk Psychological Manipulation Detected:
+        </p>
+        <p id="quiz-alert-reason" class="text-slate-300 leading-relaxed text-[11px]">
+          The proposed transfer demonstrates extreme urgency indicators and mathematically impossible Ponzi yield claims.
+          All sandbox outbound channels are temporarily restricted.
+        </p>
+      </div>
+
+      <!-- 3 Questions Form -->
+      <div class="space-y-4">
+        <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wide">Complete Cognitive Safety Quiz to Unlock Transfer:</h4>
+        <div id="quiz-questions-container" class="space-y-3">
+          <!-- Dynamically populated 3 questions -->
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <button onclick="closeModal('modal-quiz')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
+          Cancel & Protect Funds
+        </button>
+        <button onclick="submitCognitiveQuiz()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white text-xs font-bold shadow-lg shadow-rose-900/40">
+          Verify Answers & Override Lockdown
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal 5: Upload Bank Statement CSV -->
+  <div id="modal-upload-csv" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel-elevated max-w-md w-full rounded-2xl p-6 space-y-4 modal-enter">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-file-csv text-blue-400"></i>
+          Upload Bank Statement CSV
+        </h3>
+        <button onclick="closeModal('modal-upload-csv')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <p class="text-slate-400">Upload your bank statement (Vietcombank, Techcombank, MB Bank, standard formats). PII will be masked autonomously.</p>
+        <div class="border-2 border-dashed border-slate-700 rounded-2xl p-6 text-center hover:border-blue-500 transition-all cursor-pointer">
+          <input id="csv-file-input" type="file" accept=".csv" class="hidden" onchange="handleStatementCsvUpload(event)">
+          <label for="csv-file-input" class="cursor-pointer space-y-2 block">
+            <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-400"></i>
+            <span class="block text-slate-300 font-semibold">Click to browse or drop CSV statement</span>
+            <span class="text-[11px] text-slate-500 block">Supports standard bank CSV exports</span>
+          </label>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="loadSampleStatement('default')" class="w-full py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px]">
+            Reload Default 50-Transaction Benchmark
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Tier 3 Human-in-the-Loop Confirmation -->
+  <div id="modal-tier3-approval" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel-elevated max-w-md w-full rounded-3xl p-6 space-y-4 border-2 border-blue-500/80 shadow-2xl modal-enter">
+      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500 flex items-center justify-center text-blue-400 text-xl">
+            <i class="fa-solid fa-fingerprint"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-400">Tier 3 Matrix Policy</span>
+            <h3 class="text-base font-bold text-white">Human Authorization Required</h3>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-tier3-approval')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-blue-950/40 border border-blue-800/40 text-xs text-blue-200 space-y-2">
+        <p class="text-slate-300 leading-relaxed text-[11px]" id="tier3-approval-reason">
+          Transaction amount exceeds the 5,000,000 ₫ Tier 2 autonomous execution threshold. Explicit human approval is required.
+        </p>
+        <div class="space-y-1 font-mono text-[11px] pt-1">
+          <div>From: <strong id="tier3-from-wallet" class="text-white">Main Wallet</strong></div>
+          <div>To: <strong id="tier3-to-wallet" class="text-white">Fun Wallet</strong></div>
+          <div>Amount: <strong id="tier3-amount" class="text-blue-300">10,000,000 ₫</strong></div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <button onclick="closeModal('modal-tier3-approval')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
+          Reject & Cancel
+        </button>
+        <button onclick="confirmTier3HumanApproval()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-900/40 flex items-center gap-1.5">
+          <i class="fa-solid fa-check"></i>
+          <span>Authorize Transfer (2FA)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- Application Logic JS -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

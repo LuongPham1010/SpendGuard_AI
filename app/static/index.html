@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpendGuard AI — the agent that holds the wallet</title>
+  <link rel="stylesheet" href="/static/css/console.css?v=20261019_voice">
+  <script>
+    /* apply the saved theme before first paint so the page does not flash */
+    try { var t = localStorage.getItem('sg-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">S</div>
+      <div>
+        <div class="name">SpendGuard</div>
+        <div class="sub" data-i18n="subtitle">Your AI money guardian · sandbox</div>
+      </div>
+    </div>
+    <div class="status">
+      <span class="chip hide-sm" id="chip-model"><i class="dot"></i><span>checking model…</span></span>
+      <span class="chip on hide-sm" id="chip-tx"><i class="dot"></i><span>50 transactions</span></span>
+      <span class="chip on hide-sm" title="Tier 1 read-only runs on its own · Tier 2 internal moves up to 5,000,000 VND run on their own · Tier 3 needs you"><i class="dot"></i><span data-i18n="tier_banner">Auto up to 5,000,000 VND · above needs you</span></span>
+      <div class="lang-switch" aria-label="Language switch">
+        <button type="button" id="lang-en" class="active">EN</button>
+        <button type="button" id="lang-vi">VI</button>
+      </div>
+      <button class="btn-ghost notif-bell" id="notif-bell" type="button" title="Notifications" aria-label="Notifications">🔔<span class="notif-badge" id="notif-badge" hidden>0</span></button>
+      <button class="btn-ghost theme-toggle" id="theme-toggle" type="button" title="Switch light / dark theme" aria-label="Switch light or dark theme">◐</button>
+      <button class="btn-ghost" id="tools-toggle" type="button" data-i18n="btn_menu">Menu</button>
+    </div>
+  </header>
+
+  <nav class="navtabs" aria-label="Workspace tabs">
+    <div class="navtabs-left">
+      <button type="button" class="navtab active" data-tab="tab-mission" data-i18n="tab_mission">Assistant</button>
+      <button type="button" class="navtab" data-tab="tab-intelligence" data-i18n="tab_intel">Insights</button>
+      <button type="button" class="navtab" data-tab="tab-defense" data-i18n="tab_defense">Protection</button>
+      <button type="button" class="navtab" data-tab="tab-audit" data-i18n="tab_audit">Audit log</button>
+    </div>
+    <div class="forecast-status">
+      <span id="forecast-pill">30-day forecast: loading…</span>
+    </div>
+  </nav>
+
+  <!-- TAB 1: ASSISTANT (conversation on the left, wallets / approvals / audit on the right) -->
+  <main class="main tab-pane active" id="tab-mission">
+    <div class="cockpit-container">
+      <section class="conv" aria-label="agent conversation">
+        <section class="rail" aria-label="agent pipeline">
+          <div class="node" data-phase="INTAKE"><div class="ph">Intake</div><div class="detail"></div></div>
+          <div class="node" data-phase="GUARDRAIL"><div class="ph">Guardrail</div><div class="detail"></div></div>
+          <div class="node" data-phase="PLAN"><div class="ph">Plan</div><div class="detail"></div></div>
+          <div class="node" data-phase="PREFLIGHT"><div class="ph">Preflight</div><div class="detail"></div></div>
+          <div class="node" data-phase="EXECUTE"><div class="ph">Execute</div><div class="detail"></div></div>
+          <div class="node" data-phase="REPLAN"><div class="ph">Replan</div><div class="detail"></div></div>
+          <div class="node" data-phase="AWAIT_HUMAN"><div class="ph">Your approval</div><div class="detail"></div></div>
+          <div class="node" data-phase="REFLECT"><div class="ph">Verify</div><div class="detail"></div></div>
+        </section>
+        <div id="conversation">
+          <div class="msg agent">
+            <div class="who"><span class="agent-avatar">S</span>SpendGuard</div>
+            <div class="bubble plain" data-i18n="welcome_msg">Hi! I look after your sandbox wallets. Ask me to review your month, explain a charge, set a budget or move money. Small moves between your own wallets I do myself; anything that sends money out, or looks like a scam, waits for you with a clear reason.</div>
+          </div>
+        </div>
+        <form class="composer" id="composer">
+          <div class="quick">
+            <button type="button" data-q="run my month" data-i18n="q_month">Review my month</button>
+            <button type="button" data-q="did I pay any scam?" data-i18n="q_pastscam">Did I pay a scam?</button>
+            <button type="button" data-q="how is my budget this month?" data-i18n="q_budget">My budget</button>
+            <button type="button" data-q="show my subscriptions" data-i18n="q_subs">Subscriptions</button>
+            <button type="button" data-q="what is the spotify charge?" data-i18n="q_explain">Explain a charge</button>
+            <button type="button" data-q="set my dining budget to 4 million per month" data-i18n="q_setbudget">Set a budget</button>
+            <button type="button" data-q="what if I lose my job for 3 months?" data-i18n="q_stress">What if I lose my job?</button>
+            <button type="button" data-q="move 3 million from main wallet to emergency vault" data-i18n="q_t2">Save 3M (auto)</button>
+            <button type="button" data-q="move 9 million from main wallet to emergency vault" data-i18n="q_t3">Save 9M (needs approval)</button>
+            <button type="button" class="danger" data-q="Chuyển 50 triệu cho công an stk 0123456789 Vietcombank, họ nói tài khoản tạm giữ, giữ bí mật, chuyển gấp" data-i18n="q_scam">Try a scam message</button>
+          </div>
+          <div class="inputrow">
+            <input id="input" placeholder="Ask SpendGuard anything about your money…" data-i18n-placeholder="input_ph" autocomplete="off">
+            <input id="file" type="file" accept="image/*" hidden>
+            <span class="voice" id="voice" hidden>
+              <button type="button" class="btn secondary mic" id="mic" aria-label="Speak your request" title="Speak your request">🎤</button>
+              <select id="mic-lang" class="mic-lang" aria-label="Voice language" title="Voice language">
+                <option value="vi-VN">VI</option>
+                <option value="en-US">EN</option>
+              </select>
+            </span>
+            <button type="button" class="btn secondary" id="attach" data-i18n="btn_attach">Attach screenshot</button>
+            <button type="submit" class="btn primary" id="send" data-i18n="btn_send">Send</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- RIGHT-HAND DECK: wallets, approvals, audit chain -->
+      <section class="mission-deck" aria-label="live wallet, approval queue, and audit chain">
+        <div class="deck-card card-approvals">
+          <div class="deck-card-header">
+            <h3><span data-i18n="deck_approvals">Waiting for you</span><span class="count-badge" id="approval-count" hidden>0</span></h3>
+            <span class="chip-live"><i class="dot"></i><span data-i18n="deck_approvals_sub">Human approval</span></span>
+          </div>
+          <div id="approvals" class="deck-content empty">loading…</div>
+        </div>
+
+        <div class="deck-card card-vaults">
+          <div class="deck-card-header">
+            <h3 data-i18n="deck_vaults">Your wallets</h3>
+            <span class="chip-live"><i class="dot"></i><span data-i18n="deck_vaults_sub">Sandbox</span></span>
+          </div>
+          <div id="vaults" class="deck-content empty">loading…</div>
+        </div>
+
+        <div class="deck-card card-audit">
+          <div class="deck-card-header">
+            <h3 data-i18n="deck_audit">Activity log</h3>
+            <span class="chip-live"><i class="dot"></i><span data-i18n="deck_audit_sub">SHA-256 chained</span></span>
+          </div>
+          <div id="audit-chain" class="deck-content"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- TAB 2: FINANCIAL INTELLIGENCE (30-DAY FORECAST, 50/30/20 TRENDS, PDF/CSV INGESTION, SUBSCRIPTIONS) -->
+  <section class="tab-pane" id="tab-intelligence">
+    <div class="suite-grid">
+      <div class="suite-card">
+        <h3>30-day cash-flow forecast</h3>
+        <p>Projects your Main Wallet over the next 30 days from rent, subscriptions and daily spending, and warns before a shortfall.</p>
+        <div id="intel-forecast-box" class="empty">Loading forecast…</div>
+      </div>
+
+      <div class="suite-card">
+        <h3>50/30/20 by month</h3>
+        <p>How your spending splits into needs, wants and savings against the 50/30/20 rule.</p>
+        <div class="form-row" style="margin-bottom:10px">
+          <select id="intel-month-filter">
+            <option value="">All months</option>
+            <option value="2026-07">July 2026</option>
+            <option value="2026-08">August 2026</option>
+            <option value="2026-09">September 2026</option>
+          </select>
+          <button type="button" class="btn secondary" id="btn-load-intel-month">Show</button>
+        </div>
+        <div id="intel-503020-box" class="empty">Loading breakdown…</div>
+      </div>
+
+      <div class="suite-card">
+        <h3>Import a bank statement</h3>
+        <p>Upload a CSV or PDF statement. Account numbers and personal data are masked as the file is read.</p>
+        <div class="form-row">
+          <input type="file" id="intel-statement-file" accept=".csv,.pdf">
+          <button type="button" class="btn primary" id="btn-upload-statement">Upload</button>
+        </div>
+        <div id="intel-upload-status" class="next-hint">✓ 50 sample transactions are loaded.</div>
+        <div id="intel-tx-preview-container" style="display:none;margin-top:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <b style="font-size:13.5px">Transactions read from the file</b>
+            <span id="intel-tx-count-badge" class="badge">0 rows</span>
+          </div>
+          <div class="preview-table-wrap">
+            <table class="preview-table">
+              <thead>
+                <tr><th>Date</th><th>Description</th><th style="text-align:right">Amount</th><th>Category</th></tr>
+              </thead>
+              <tbody id="intel-tx-preview-tbody"></tbody>
+            </table>
+          </div>
+          <div class="next-hint">Next: open the <b>Assistant</b> tab and ask <b>Review my month</b> to analyse this statement.</div>
+        </div>
+      </div>
+
+      <div class="suite-card">
+        <h3>Recurring subscriptions</h3>
+        <p>Charges that repeat every 25–35 days. Cancelling one is a Tier 2 action the agent can do on its own.</p>
+        <div id="intel-subs-box" class="empty">Loading subscriptions…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: AUTONOMOUS DEFENSE (GUARDIAN SCANNER, 3-AGENT DEBATE, MONTE CARLO) -->
+  <section class="tab-pane" id="tab-defense">
+    <div class="suite-grid">
+      <div class="suite-card">
+        <h3>Check a transfer for scams</h3>
+        <p>Paste the message you received and the account you were asked to pay. The same checks run before every real transfer.</p>
+        <div class="form-row">
+          <input type="text" id="def-scam-payee" placeholder="Payee / Account (e.g. 0123456789)" value="0123456789">
+          <input type="number" id="def-scam-amount" placeholder="Amount VND" value="50000000">
+        </div>
+        <div class="form-row">
+          <input type="text" id="def-scam-note" placeholder="Transfer note / chat message" value="Chuyển gấp vào tài khoản tạm giữ công an điều tra giữ bí mật">
+          <button type="button" class="btn primary" id="btn-def-scan">Scan Risk</button>
+        </div>
+        <div id="def-scam-output" class="empty" style="margin-top:10px">Ready to scan.</div>
+      </div>
+
+      <div class="suite-card">
+        <h3>Second opinion on a purchase</h3>
+        <p>Three agents (an optimist, a risk auditor and an arbiter) debate whether you can afford it, using your real balances.</p>
+        <div class="form-row">
+          <input type="text" id="def-debate-item" placeholder="Item name" value="iPhone 16 Pro Max">
+          <input type="number" id="def-debate-price" placeholder="Price VND" value="34990000">
+          <button type="button" class="btn primary" id="btn-def-debate">Run Debate</button>
+        </div>
+        <div id="def-debate-output" class="empty" style="margin-top:10px">Select an item to deliberate.</div>
+      </div>
+
+      <div class="suite-card">
+        <h3>Stress test (1,000 simulations)</h3>
+        <p>Simulates the next 12 months with income cuts, emergencies and inflation to see how long your savings last.</p>
+        <div class="form-row">
+          <input type="number" id="def-mc-savings" placeholder="Initial Savings" value="120000000">
+          <input type="number" id="def-mc-income" placeholder="Monthly Income" value="35000000">
+          <input type="number" id="def-mc-expense" placeholder="Monthly Expense" value="22000000">
+          <button type="button" class="btn primary" id="btn-def-mc">Simulate</button>
+        </div>
+        <div id="def-mc-output" class="empty" style="margin-top:10px">Loading simulation…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: AUDIT TRAIL & COMPLIANCE CERTIFICATE -->
+  <section class="tab-pane" id="tab-audit">
+    <div class="suite-grid">
+      <div class="suite-card" style="grid-column: 1 / -1">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div>
+            <h3>Tamper-evident audit log</h3>
+            <p>Every action the agent takes is chained with SHA-256, so any later edit to the log breaks the chain.</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button type="button" class="btn primary" id="btn-audit-all">All events</button>
+            <button type="button" class="btn secondary" id="btn-audit-financial">Money moves only</button>
+            <button type="button" class="btn secondary" id="btn-refresh-cert">Refresh</button>
+            <button type="button" class="btn secondary" id="btn-export-cert">Export certificate (JSON)</button>
+          </div>
+        </div>
+        <div id="audit-cert-summary" style="margin-top:12px">Loading certificate…</div>
+        <div id="audit-ledger-list" style="margin-top:14px;max-height:520px;overflow-y:auto;font-size:13px"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="overlay" id="guardian-overlay" role="alertdialog" aria-label="Transfer frozen by Guardian">
+  <div class="intercept">
+    <header>
+      <svg class="gauge" viewBox="0 0 84 84">
+        <circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/>
+        <circle id="gauge-arc" cx="42" cy="42" r="34" fill="none" stroke="#ff4d5e" stroke-width="8" stroke-linecap="round" transform="rotate(-90 42 42)" stroke-dasharray="0 999"/>
+        <text id="gauge-text" x="42" y="48" text-anchor="middle">0</text>
+      </svg>
+      <div>
+        <h2 id="intercept-title">Transfer frozen</h2>
+        <div class="kind" id="intercept-kind">Suspicious transfer</div>
+        <div class="lede" id="intercept-lede">Your money has not moved. This looks like a known scam pattern.</div>
+      </div>
+    </header>
+    <div class="cols">
+      <div><h4 id="intercept-saw-h">Why I stopped it</h4><ul id="intercept-evidence"></ul></div>
+      <div><h4 id="intercept-know-h">What you should know</h4><ul id="intercept-facts"></ul></div>
+    </div>
+    <p class="empty" id="intercept-actions"></p>
+    <footer>
+      <span class="countdown" id="intercept-countdown">cooling-off 60s</span>
+      <button class="btn secondary" id="intercept-speak" type="button" hidden>🔊 Read aloud</button>
+      <button class="btn secondary" id="intercept-close">Review in approval queue</button>
+    </footer>
+  </div>
+</div>
+
+<div class="modal" id="quiz-modal"><form id="quiz-form"></form></div>
+
+<div class="notif-panel" id="notif-panel" hidden aria-label="Notifications">
+  <div class="notif-head"><b id="notif-title">Notifications</b><small>simulated push</small></div>
+  <div id="notif-list" class="empty">No notifications yet.</div>
+</div>
+
+<aside class="drawer" id="drawer">
+  <div class="drawer-section">
+    <h3 data-i18n="menu_demo">Demo controls</h3>
+    <button class="btn-ghost" id="btn-reset-wallets" type="button" data-i18n="btn_reset_wallets" title="Reset sandbox wallets to default">Reset sandbox wallets</button>
+    <button class="btn-ghost" id="reset-rail" type="button" data-i18n="btn_clear" title="Clear the pipeline display">Clear the pipeline display</button>
+  </div>
+  <h3 data-i18n="menu_links">More</h3>
+  <a href="/legacy" target="_blank">Classic full dashboard<small>Chart.js 50/30/20 view, subscriptions, debate arena, Monte Carlo, statement, audit stream</small></a>
+  <a href="/docs" target="_blank">API reference<small>every tool the agent uses is a plain endpoint</small></a>
+  <a href="/api/audit/certificate" target="_blank">Compliance certificate (JSON)<small>verifiable SHA-256 chain snapshot</small></a>
+  <a href="/api/audit-logs?limit=100" target="_blank">Audit log (raw)<small>chained SHA-256 execution evidence</small></a>
+</aside>
+
+<div class="toast" id="toast"></div>
+<script src="/static/js/console.js?v=20261019_voice2"></script>
+<script>
+  /* 4-Tab Switching, Bilingual [EN | VI] Toggle, and Suite Panel Wiring */
+  (function () {
+    const I18N = {
+      en: {
+        subtitle: 'Your AI money guardian · sandbox',
+        tier_banner: 'Auto up to 5,000,000 VND · above needs you',
+        btn_menu: 'Menu',
+        menu_demo: 'Demo controls',
+        menu_links: 'More',
+        btn_reset_wallets: 'Reset sandbox wallets',
+        btn_clear: 'Clear the pipeline display',
+        tab_mission: 'Assistant',
+        tab_intel: 'Insights',
+        tab_defense: 'Protection',
+        tab_audit: 'Audit log',
+        welcome_msg: 'Hi! I look after your sandbox wallets. Ask me to review your month, explain a charge, set a budget or move money. Small moves between your own wallets I do myself; anything that sends money out, or looks like a scam, waits for you with a clear reason.',
+        q_month: 'Review my month',
+        q_pastscam: 'Did I pay a scam?',
+        q_budget: 'My budget',
+        q_subs: 'Subscriptions',
+        q_explain: 'Explain a charge',
+        q_setbudget: 'Set a budget',
+        q_stress: 'What if I lose my job?',
+        q_t2: 'Save 3M (auto)',
+        q_t3: 'Save 9M (needs approval)',
+        q_scam: 'Try a scam message',
+        input_ph: 'Ask SpendGuard anything about your money…',
+        btn_attach: 'Attach screenshot',
+        btn_send: 'Send',
+        deck_vaults: 'Your wallets',
+        deck_vaults_sub: 'Sandbox',
+        deck_approvals: 'Waiting for you',
+        deck_approvals_sub: 'Human approval',
+        deck_audit: 'Activity log',
+        deck_audit_sub: 'SHA-256 chained'
+      },
+      vi: {
+        subtitle: 'Trợ lý AI bảo vệ tiền của bạn · sandbox',
+        tier_banner: 'Tự động tới 5.000.000 VND · lớn hơn cần bạn duyệt',
+        btn_menu: 'Menu',
+        menu_demo: 'Điều khiển demo',
+        menu_links: 'Thêm',
+        btn_reset_wallets: 'Đặt lại ví sandbox',
+        btn_clear: 'Xóa hiển thị pipeline',
+        tab_mission: 'Trợ lý',
+        tab_intel: 'Phân tích',
+        tab_defense: 'Bảo vệ',
+        tab_audit: 'Nhật ký',
+        welcome_msg: 'Xin chào! Tôi quản lý các ví sandbox của bạn. Hãy nhờ tôi rà soát tháng, giải thích một khoản phí, đặt ngân sách hoặc chuyển tiền. Chuyển nhỏ giữa các ví của bạn tôi tự làm; mọi khoản chuyển ra ngoài hoặc có dấu hiệu lừa đảo sẽ chờ bạn duyệt kèm lý do rõ ràng.',
+        q_month: 'Rà soát tháng',
+        q_pastscam: 'Tôi có bị lừa không?',
+        q_budget: 'Ngân sách',
+        q_subs: 'Gói đăng ký',
+        q_explain: 'Giải thích khoản phí',
+        q_setbudget: 'Đặt ngân sách',
+        q_stress: 'Nếu tôi mất việc?',
+        q_t2: 'Tiết kiệm 3 triệu (tự động)',
+        q_t3: 'Tiết kiệm 9 triệu (cần duyệt)',
+        q_scam: 'Thử tin nhắn lừa đảo',
+        input_ph: 'Hỏi SpendGuard bất cứ điều gì về tiền của bạn…',
+        btn_attach: 'Đính kèm ảnh',
+        btn_send: 'Gửi',
+        deck_vaults: 'Ví của bạn',
+        deck_vaults_sub: 'Sandbox',
+        deck_approvals: 'Chờ bạn duyệt',
+        deck_approvals_sub: 'Người duyệt',
+        deck_audit: 'Nhật ký hoạt động',
+        deck_audit_sub: 'Chuỗi SHA-256'
+      }
+    };
+
+    function applyLang(lang) {
+      window.SG_LANG = lang;
+      document.documentElement.lang = lang;
+      const dict = I18N[lang] || I18N.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (dict[k]) el.textContent = dict[k];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const k = el.getAttribute('data-i18n-placeholder');
+        if (dict[k]) el.setAttribute('placeholder', dict[k]);
+      });
+      document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+      document.getElementById('lang-vi').classList.toggle('active', lang === 'vi');
+      document.dispatchEvent(new CustomEvent('sg:lang', { detail: lang }));
+    }
+
+    document.getElementById('lang-en').addEventListener('click', () => applyLang('en'));
+    document.getElementById('lang-vi').addEventListener('click', () => applyLang('vi'));
+
+    document.querySelectorAll('.navtab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.navtab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const pane = document.getElementById(btn.dataset.tab);
+        if (pane) pane.classList.add('active');
+        if (btn.dataset.tab === 'tab-intelligence') loadIntelTab();
+        if (btn.dataset.tab === 'tab-audit') loadAuditTab();
+      });
+    });
+
+    const vnd = (n) => Number(n || 0).toLocaleString('en-US') + ' VND';
+    const statusText = (s) => ({
+      HEALTHY: '<b style="color:var(--signal)">on track</b>', ON_TRACK: '<b style="color:var(--signal)">on track</b>',
+      OVER_BUDGET: '<b style="color:var(--alarm)">over budget</b>', UNDER_FUNDED: '<b style="color:var(--warn)">below target</b>'
+    }[s] || s);
+
+    async function loadForecastBanner() {
+      try {
+        const r = await fetch('/api/cashflow/forecast');
+        const f = await r.json();
+        const pill = document.getElementById('forecast-pill');
+        if (pill) {
+          pill.textContent = f.shortfall_detected
+            ? `⚠ 30-day forecast: shortfall on ${f.shortfall_date} (lowest ${vnd(f.minimum_projected_balance)})`
+            : `✓ 30-day forecast: no shortfall · Main Wallet ends at ${vnd(f.ending_main_balance)}`;
+          pill.style.color = f.shortfall_detected ? 'var(--warn)' : 'var(--muted)';
+        }
+        const box = document.getElementById('intel-forecast-box');
+        if (box) {
+          box.innerHTML = `
+            <div class="stat-row"><span>Main Wallet today</span><b>${vnd(f.starting_main_balance)}</b></div>
+            <div class="stat-row"><span>Lowest point in 30 days</span><b style="color:${f.shortfall_detected ? 'var(--alarm)' : 'var(--signal)'}">${vnd(f.minimum_projected_balance)}</b></div>
+            <div class="stat-row"><span>After 30 days</span><b>${vnd(f.ending_main_balance)}</b></div>
+            <div class="stat-row"><span>Average daily spending</span><span>${vnd(f.daily_burn_rate)}/day</span></div>
+            <div class="next-hint">${f.summary}</div>`;
+        }
+      } catch (e) {}
+    }
+
+    async function loadIntelMonth(month = '') {
+      try {
+        const url = month ? `/api/dashboard/overview?month=${encodeURIComponent(month)}` : '/api/dashboard/overview';
+        const r = await fetch(url);
+        const d = await r.json();
+        const b = d.adherence_50_30_20.breakdown;
+        const trends = d.adherence_50_30_20.trends || {};
+        document.getElementById('intel-503020-box').innerHTML = `
+          <div class="stat-row"><span>Money in</span><b style="color:var(--signal)">${vnd(d.total_income_month)}</b></div>
+          <div class="stat-row"><span>Money out (vs last month ${trends.mom_expense_delta_pct || 0}%)</span><b style="color:var(--alarm)">${vnd(d.total_expense_month)}</b></div>
+          <div class="stat-row"><span>Needs (target 50%)</span><span>${vnd(b.Needs.amount)} · ${b.Needs.actual_pct}% · ${statusText(b.Needs.status)}</span></div>
+          <div class="stat-row"><span>Wants (target 30%)</span><span>${vnd(b.Wants.amount)} · ${b.Wants.actual_pct}% · ${statusText(b.Wants.status)}</span></div>
+          <div class="stat-row"><span>Savings (target 20%)</span><span>${vnd(b.Savings.amount)} · ${b.Savings.actual_pct}% · ${statusText(b.Savings.status)}</span></div>`;
+      } catch (e) {}
+    }
+
+    async function loadIntelSubs() {
+      try {
+        const r = await fetch('/api/subscriptions');
+        const d = await r.json();
+        const box = document.getElementById('intel-subs-box');
+        if (!box) return;
+        box.innerHTML = `<div class="stat-row"><span>Still paying per year</span><b style="color:var(--alarm)">${vnd(d.active_annual_leakage_vnd)}</b></div>
+          <div class="stat-row" style="margin-bottom:6px"><span>Saved by cancelling</span><b style="color:var(--signal)">${vnd(d.saved_annual_leakage_vnd)}</b></div>` +
+          (d.subscriptions || []).map(s => `
+            <div class="stat-row" style="align-items:center">
+              <span><b>${s.merchant}</b><br><small style="color:var(--muted)">${vnd(s.amount)} every ${Math.round(s.frequency_days)} days</small></span>
+              <span>${s.status === 'cancelled' ? '<b style="color:var(--signal)">Cancelled</b>' : `<button class="btn-ghost" data-intel-cancel="${s.merchant}">Cancel</button>`}</span>
+            </div>`).join('');
+      } catch (e) {}
+    }
+
+    function loadIntelTab() {
+      loadForecastBanner();
+      loadIntelMonth(document.getElementById('intel-month-filter').value);
+      loadIntelSubs();
+    }
+
+    let lastCert = null;
+    let auditFilter = 'all';
+
+    function renderAuditLedger() {
+      if (!lastCert || !lastCert.recent_ledger) return;
+      const listEl = document.getElementById('audit-ledger-list');
+      if (!listEl) return;
+
+      let events = lastCert.recent_ledger;
+      if (auditFilter === 'financial') {
+        events = events.filter(l => l.tier !== 'Tier 1' || (l.module === 'SandboxWallets' && l.action.includes('TRANSFER')));
+      }
+
+      if (events.length === 0) {
+        listEl.innerHTML = `<div class="empty" style="padding:15px;text-align:center">No ${auditFilter === 'financial' ? 'financial transfers' : 'events'} found in recent ledger.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = events.map((l, idx) => {
+        const isTransfer = (l.module === 'SandboxWallets' && l.action.includes('TRANSFER'));
+        const isTier2 = l.tier === 'Tier 2';
+        const isTier3 = l.tier === 'Tier 3';
+        const d = l.details || {};
+
+        let summaryHtml = '';
+        if (isTransfer && d.amount) {
+          summaryHtml = `
+            <div style="margin-top:4px;font-weight:600">
+              ${vnd(d.amount)}: ${d.src || d.source || 'Source'} → ${d.dst || d.destination || 'Destination'}
+            </div>`;
+        } else if (d.merchant || d.reason || d.item) {
+          summaryHtml = `
+            <div style="margin-top:4px;color:var(--muted)">
+              ${d.merchant ? `Merchant: <b>${d.merchant}</b> ` : ''}
+              ${d.reason ? `Reason: ${d.reason}` : ''}
+            </div>`;
+        }
+
+        const rowClass = isTransfer ? 'transfer' : isTier3 ? 't3' : isTier2 ? 't2' : '';
+
+        return `
+          <div class="audit-row ${rowClass}"
+               onclick="const el=document.getElementById('audit-detail-${idx}'); el.style.display = el.style.display === 'none' ? 'block' : 'none'">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+              <span>
+                <span style="color:var(--muted)">${l.timestamp.slice(11, 19)}</span>
+                · <b style="color:${isTier3 ? 'var(--alarm)' : isTier2 ? 'var(--info)' : 'var(--text)'}">${l.tier}</b>
+                · ${l.module} · ${l.action.replace(/_/g, ' ').toLowerCase()}
+              </span>
+              <span class="mono" style="color:var(--dim);font-size:11.5px">${l.status} · #${l.trace_hash} ▾</span>
+            </div>
+            ${summaryHtml}
+            <div id="audit-detail-${idx}" style="display:none">
+              <pre>${JSON.stringify({ id: l.id, timestamp: l.timestamp, tier: l.tier, status: l.status, details: l.details, trace_hash: l.trace_hash }, null, 2)}</pre>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadAuditTab() {
+      try {
+        const r = await fetch('/api/audit/certificate');
+        const c = await r.json();
+        lastCert = c;
+        document.getElementById('audit-cert-summary').innerHTML = `
+          <div class="stat-row"><span>Certificate</span><b class="mono">${c.certificate_id}</b></div>
+          <div class="stat-row"><span>Chain start → latest hash</span><span class="mono">${c.chain_genesis} → <b style="color:var(--signal)">${c.chain_head_hash}</b></span></div>
+          <div class="stat-row"><span>Certificate SHA-256</span><span class="mono" style="word-break:break-all">${c.certificate_sha256}</span></div>
+          <div class="stat-row"><span>Events verified</span><b>${c.verified_events_count}</b></div>`;
+        renderAuditLedger();
+      } catch (e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadForecastBanner();
+
+      document.getElementById('btn-reset-wallets').addEventListener('click', async () => {
+        await fetch('/api/wallets/reset', { method: 'POST' });
+        location.reload();
+      });
+
+      document.getElementById('btn-load-intel-month').addEventListener('click', () => {
+        loadIntelMonth(document.getElementById('intel-month-filter').value);
+      });
+
+      document.getElementById('btn-upload-statement').addEventListener('click', async () => {
+        const f = document.getElementById('intel-statement-file').files[0];
+        if (!f) return;
+        const btn = document.getElementById('btn-upload-statement');
+        const statusEl = document.getElementById('intel-upload-status');
+        btn.disabled = true;
+        statusEl.textContent = 'Ingesting and parsing statement…';
+        try {
+          const fd = new FormData();
+          fd.append('file', f);
+          const endpoint = f.name.toLowerCase().endsWith('.pdf') ? '/api/transactions/upload-pdf' : '/api/transactions/upload';
+          const r = await fetch(endpoint, { method: 'POST', body: fd });
+          const d = await r.json();
+          statusEl.textContent = d.message || d.detail || 'Done.';
+          if (d.success && d.transactions && d.transactions.length > 0) {
+            const previewBox = document.getElementById('intel-tx-preview-container');
+            const tbody = document.getElementById('intel-tx-preview-tbody');
+            const countBadge = document.getElementById('intel-tx-count-badge');
+            if (previewBox && tbody) {
+              countBadge.textContent = `${d.transactions.length} rows`;
+              tbody.innerHTML = d.transactions.map(t => `
+                <tr>
+                  <td style="white-space:nowrap">${t.date || ''}</td>
+                  <td>${t.description || ''} ${t.is_subscription ? '<span class="badge" style="color:var(--alarm)">subscription</span>' : ''}</td>
+                  <td style="text-align:right;white-space:nowrap;color:${t.type === 'inflow' ? 'var(--signal)' : 'var(--text)'}">${t.type === 'inflow' ? '+' : '−'}${vnd(t.amount)}</td>
+                  <td style="color:var(--muted)">${t.category || t.category_50_30_20 || ''}</td>
+                </tr>
+              `).join('');
+              previewBox.style.display = 'block';
+            }
+            const txChip = document.getElementById('chip-tx');
+            if (txChip) {
+              txChip.className = 'chip on';
+              txChip.querySelector('span').textContent = `${d.transactions.length} tx`;
+            }
+          }
+          loadIntelTab();
+        } catch (err) {
+          statusEl.textContent = 'Upload failed: ' + err.message;
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      document.getElementById('intel-subs-box').addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-intel-cancel]');
+        if (!btn) return;
+        await fetch(`/api/subscriptions/${encodeURIComponent(btn.dataset.intelCancel)}/cancel`, { method: 'POST' });
+        loadIntelSubs();
+      });
+
+      document.getElementById('btn-def-scan').addEventListener('click', async () => {
+        const r = await fetch('/api/anti-scam/scan', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipient_name: document.getElementById('def-scam-payee').value,
+            recipient_account: document.getElementById('def-scam-payee').value,
+            bank_name: 'Vietcombank',
+            amount: Number(document.getElementById('def-scam-amount').value || 0),
+            transfer_note: document.getElementById('def-scam-note').value,
+            advertised_yield_daily_pct: 0,
+            source_context: 'Console Defense Scan'
+          })
+        });
+        const d = await r.json();
+        document.getElementById('def-scam-output').innerHTML = `<b style="color:${d.is_locked ? 'var(--alarm)' : 'var(--signal)'}">Risk ${d.risk_score}/100 (${d.risk_level}) · ${d.is_locked ? 'LOCKED' : 'CLEAR'}</b><br>${d.explanation}`;
+      });
+
+      document.getElementById('btn-def-debate').addEventListener('click', async () => {
+        const r = await fetch('/api/debate', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            item_name: document.getElementById('def-debate-item').value,
+            price: Number(document.getElementById('def-debate-price').value || 0),
+            user_income: 35000000,
+            user_justification: 'Evaluated from Autonomous Defense console'
+          })
+        });
+        const d = await r.json();
+        document.getElementById('def-debate-output').innerHTML = `<b style="color:var(--info)">Verdict: ${d.verdict} (${d.confidence_score}%)</b><br>${d.executive_summary}`;
+      });
+
+      document.getElementById('btn-def-mc').addEventListener('click', async () => {
+        const r = await fetch('/api/monte-carlo', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            initial_savings: Number(document.getElementById('def-mc-savings').value || 120000000),
+            monthly_income: Number(document.getElementById('def-mc-income').value || 35000000),
+            monthly_expenses: Number(document.getElementById('def-mc-expense').value || 22000000),
+            num_simulations: 1000,
+            months: 12
+          })
+        });
+        const d = await r.json();
+        document.getElementById('def-mc-output').innerHTML = `<b style="color:var(--signal)">Resilience ${d.resilience_score}/100 · Depletion Risk ${d.bankruptcy_probability}%</b><br>Recommended 6M Buffer: ${vnd(d.recommended_emergency_buffer)}`;
+      });
+
+      const btnAll = document.getElementById('btn-audit-all');
+      const btnFin = document.getElementById('btn-audit-financial');
+      if (btnAll && btnFin) {
+        btnAll.addEventListener('click', () => {
+          auditFilter = 'all';
+          btnAll.classList.add('primary');
+          btnAll.classList.remove('secondary');
+          btnFin.classList.add('secondary');
+          btnFin.classList.remove('primary');
+          renderAuditLedger();
+        });
+        btnFin.addEventListener('click', () => {
+          auditFilter = 'financial';
+          btnFin.classList.add('primary');
+          btnFin.classList.remove('secondary');
+          btnAll.classList.add('secondary');
+          btnAll.classList.remove('primary');
+          renderAuditLedger();
+        });
+      }
+
+      document.getElementById('btn-refresh-cert').addEventListener('click', loadAuditTab);
+      document.getElementById('btn-export-cert').addEventListener('click', async () => {
+        if (!lastCert) await loadAuditTab();
+        const blob = new Blob([JSON.stringify(lastCert, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${(lastCert && lastCert.certificate_id) || 'spendguard-audit-certificate'}.json`;
+        a.click();
+      });
+    });
+  })();
+</script>
+</body>
+</html>

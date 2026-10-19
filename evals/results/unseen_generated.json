@@ -1,0 +1,194 @@
+{
+ "model": "gemini-3.8-flash",
+ "cases": [
+  {
+   "text": "Cán bộ điều tra yêu cầu nghi can nộp toàn bộ tài sản vào tài khoản thẩm tra nghiệp vụ phục vụ chuyên án rửa tiền.",
+   "label": "scam",
+   "amount_vnd": 85000000,
+   "payee_new": true
+  },
+  {
+   "text": "Security Alert: Unauthorized access detected on your banking application. Move your available funds to our backup security node immediately.",
+   "label": "scam",
+   "amount_vnd": 42000000,
+   "payee_new": true
+  },
+  {
+   "text": "Chúc mừng bạn đã tích lũy 10 đơn hàng trên hệ thống, nộp phí bảo chứng nâng hạng cộng tác viên để rút tiền hoa hồng về ví.",
+   "label": "scam",
+   "amount_vnd": 7500000,
+   "payee_new": true
+  },
+  {
+   "text": "Enroll in our algorithmic trading strategy today to lock in guaranteed daily returns of twelve percent without capital downside.",
+   "label": "scam",
+   "amount_vnd": 50000000,
+   "payee_new": true
+  },
+  {
+   "text": "Ngân hàng đang đồng bộ chữ ký số thông minh, vui lòng thanh toán phí kích hoạt mã xác thực giao dịch để tránh gián đoạn dịch vụ.",
+   "label": "scam",
+   "amount_vnd": 3200000,
+   "payee_new": true
+  },
+  {
+   "text": "Your inbound international courier parcel is held at the airport terminal. Remit customs administrative import duty to prevent confiscation.",
+   "label": "scam",
+   "amount_vnd": 18500000,
+   "payee_new": true
+  },
+  {
+   "text": "Anh mua tặng em kiện hàng trang sức quý từ nước ngoài nhưng bị kẹt ở sân bay, em thanh toán phí vận chuyển ngoại giao giúp anh nhé.",
+   "label": "scam",
+   "amount_vnd": 24000000,
+   "payee_new": true
+  },
+  {
+   "text": "Official Winner Notification: Wire the state paperwork notary tax to claim the grand prize sport utility vehicle from our promotion.",
+   "label": "scam",
+   "amount_vnd": 15000000,
+   "payee_new": true
+  },
+  {
+   "text": "Bố ơi con đang bị giữ ở cơ quan chức năng sau tai nạn trên quốc lộ, gửi tiền đền bù thiệt hại cho bên kia ngay để họ rút đơn kiện.",
+   "label": "scam",
+   "amount_vnd": 30000000,
+   "payee_new": true
+  },
+  {
+   "text": "Our store accounting department mistakenly sent an excessive refund to your profile. Please route the excess surplus back via wire.",
+   "label": "scam",
+   "amount_vnd": 6800000,
+   "payee_new": true
+  },
+  {
+   "text": "Tôi đã gửi ảnh biên lai ngân hàng rồi đó, do chuyển khoản liên chi nhánh nên bạn phải thanh toán phí bảo đảm giao dịch tiền mới về tài khoản.",
+   "label": "scam",
+   "amount_vnd": 4500000,
+   "payee_new": true
+  },
+  {
+   "text": "Notice of pending account suspension: Authorize mandatory security verification deposit to reactivate outgoing electronic settlements.",
+   "label": "scam",
+   "amount_vnd": 22000000,
+   "payee_new": true
+  },
+  {
+   "text": "Chuyên gia tài chính bao lỗ tuyệt đối, nạp vốn đợt đầu vào sàn hợp đồng tương lai để nhận tín hiệu kéo lệnh nhân ba tài sản.",
+   "label": "scam",
+   "amount_vnd": 20000000,
+   "payee_new": true
+  },
+  {
+   "text": "Dearest, customs agents at the border transit post demand freight release duties for my luggage containing our joint savings.",
+   "label": "scam",
+   "amount_vnd": 35000000,
+   "payee_new": true
+  },
+  {
+   "text": "Thông báo trúng thưởng chương trình quay số may mắn, khách hàng chuyển khoản lệ phí hồ sơ trước mười bảy giờ để ban tổ chức trao giải.",
+   "label": "scam",
+   "amount_vnd": 5000000,
+   "payee_new": true
+  },
+  {
+   "text": "Em gửi tiền thuê căn hộ tháng mười một cho chị nhé, hôm nay là hạn chót thanh toán theo hợp đồng thuê nhà rồi ạ.",
+   "label": "legit",
+   "amount_vnd": 9000000,
+   "payee_new": false
+  },
+  {
+   "text": "Clearing the semester academic tuition for international business modules before the university registration deadline.",
+   "label": "legit",
+   "amount_vnd": 28500000,
+   "payee_new": false
+  },
+  {
+   "text": "Con chuyển khoản đóng tiền viện phí tạm ứng phẫu thuật cho mẹ ở bệnh viện Ung Bướu, bác sĩ hẹn đầu giờ chiều làm thủ tục.",
+   "label": "legit",
+   "amount_vnd": 12000000,
+   "payee_new": false
+  },
+  {
+   "text": "Sending my half of the administrative fine for the camera speed violation we got during our road trip last Sunday.",
+   "label": "legit",
+   "amount_vnd": 2000000,
+   "payee_new": false
+  },
+  {
+   "text": "Cửa hàng gửi lại khoản hoàn tiền cho chị Linh do mẫu áo khoác dạ size M bị hết hàng trong kho, shop xin lỗi chị nhiều nhé.",
+   "label": "legit",
+   "amount_vnd": 850000,
+   "payee_new": true
+  },
+  {
+   "text": "Urgent payment to neighborhood pharmacy for prescription asthma medication delivered directly to grandfather at home.",
+   "label": "legit",
+   "amount_vnd": 1450000,
+   "payee_new": false
+  },
+  {
+   "text": "Thanh toán cước tiêu thụ điện sinh hoạt và nước máy tháng vừa qua cho ban quản lý tòa nhà.",
+   "label": "legit",
+   "amount_vnd": 1780000,
+   "payee_new": false
+  },
+  {
+   "text": "Sharing my portion of the grilled barbecue team lunch with our project colleagues yesterday afternoon.",
+   "label": "legit",
+   "amount_vnd": 320000,
+   "payee_new": false
+  },
+  {
+   "text": "Đặt cọc tiền mua xe máy cũ sau khi hai bên đã kiểm tra hiện trạng xe và ký kết biên bản giao nhận tại nhà riêng.",
+   "label": "legit",
+   "amount_vnd": 5000000,
+   "payee_new": true
+  },
+  {
+   "text": "Paying the annual premium gym membership renewal at the sports complex front desk after contract sign-off.",
+   "label": "legit",
+   "amount_vnd": 7200000,
+   "payee_new": false
+  },
+  {
+   "text": "Đóng tiền quỹ liên hoan sinh nhật quý bốn của phòng nhân sự mua hoa và bánh ngọt chúc mừng đồng nghiệp.",
+   "label": "legit",
+   "amount_vnd": 250000,
+   "payee_new": false
+  },
+  {
+   "text": "Reimbursing flatmate for the weekly food market haul including fresh produce and pantry cooking ingredients.",
+   "label": "legit",
+   "amount_vnd": 640000,
+   "payee_new": false
+  },
+  {
+   "text": "Gửi trả chị gái tiền nhờ mua hộ giỏ hoa quả tươi nhập khẩu thắp hương ngày rằm hôm trước.",
+   "label": "legit",
+   "amount_vnd": 950000,
+   "payee_new": false
+  },
+  {
+   "text": "Releasing milestone settlement to home interior contractor after approving tile installation during afternoon property walk-through.",
+   "label": "legit",
+   "amount_vnd": 16000000,
+   "payee_new": false
+  },
+  {
+   "text": "Monthly payment for daughter weekend classical piano tutoring course directly to her music teacher.",
+   "label": "legit",
+   "amount_vnd": 2400000,
+   "payee_new": false
+  }
+ ],
+ "metrics": {
+  "precision": 0.9166666666666666,
+  "recall": 0.7333333333333333,
+  "f1": 0.8148148148148148,
+  "tp": 11,
+  "fp": 1,
+  "fn": 4,
+  "tn": 14
+ }
+}

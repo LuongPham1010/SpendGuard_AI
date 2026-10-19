@@ -1,0 +1,27 @@
+{
+  "weights": {
+    "authority_impersonation": 2.6,
+    "urgency": 0.75,
+    "secrecy": 1.6,
+    "safe_account": 2.2,
+    "ponzi_math": 0.9,
+    "task_scheme": 2.7,
+    "prize": 1.6,
+    "otp_request": 2.4,
+    "romance": 4.218,
+    "customs_fee": 2.1,
+    "payee_is_new": 2.062,
+    "amount_ratio_30d": 0.9,
+    "drains_vault": 1.4,
+    "unusual_hour": 0.5,
+    "velocity": 0.8,
+    "round_large": 0.562,
+    "llm_confidence": 1.5,
+    "payee_blacklisted": 4.0,
+    "refund_scam": 2.0,
+    "relative_emergency": 2.2,
+    "fake_receipt": 2.0
+  },
+  "bias": -2.0,
+  "threshold": 70.0
+}

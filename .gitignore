@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+logs/*.log
+.pytest_cache/
+*.rar
+*.docx
+data/memory/
+.superpowers/
+project_codebase.txt
+frontend_bundle.txt
+
+# Internal working notes, not part of the submission
+docs/superpowers/
